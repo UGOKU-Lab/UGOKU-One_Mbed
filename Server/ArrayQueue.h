@@ -25,7 +25,7 @@ public:
     T result = _array[0];
 
     _array_count--;
-    memcpy(_array, _array + 1, _array_count);
+    memcpy(_array, _array + 1, sizeof(T) * _array_count);
 
     return result;
   }
