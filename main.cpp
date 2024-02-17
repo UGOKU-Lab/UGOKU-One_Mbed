@@ -1,29 +1,45 @@
 #include "Server/ConsoleServer.h"
+#include "channel.h"
 #include "mbed.h"
+#include "pin.h"
+#include <chrono>
+#include <cstdint>
 
-PwmOut led(PA_7);
+PwmOut led(PIN_LED1);
+PwmOut servo(PIN_SERVO1);
+PwmOut motor(PIN_MOTOR1);
+AnalogIn sensor(PIN_ANALOG1);
 
-// Data map.
-uint8_t values[256] = {};
+ConsoleServer<CH_MAX> server;
 
-// A function callbacked on data received.
-void on_receive(uint8_t channel, uint8_t value) {
-  values[channel] = value;
+bool is_connected() {
+  return server.read(CH_CONNECTED) != 0;
+}
+
+inline void setup() {
+  servo.period_ms(20);
+  servo.pulsewidth_us(1500);
 }
 
 int main() {
-  ConsoleServer server;
-  server.attach(&on_receive);
+  setup();
 
   while (true) {
-    // Write LED with a value on channel 0.
-    led.write((float)values[0] / 255);
+    server.task();
 
-    // Echo back to channel 1.
-    values[1] = 255 - values[0];
-    server.send(1, values[1]);
+    if (!is_connected()) {
+      led.write(1);  // status: disconnected
+      servo.pulsewidth_us(1500);
+      motor.write(0);
+      continue;
+    }
 
-    printf("c, v: %d, %d\r\n", 0, values[0]);
+    led.write(0);  // status: connected
+    servo.pulsewidth_us(server.read_ratio(CH_SERVO1) * 1000 + 1000);
+    motor.write(server.read(CH_MOTOR1));
+
+    server.send(CH_SENSOR, sensor.read() * 255);
+
     wait_us(100000);
   }
 }

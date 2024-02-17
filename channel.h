@@ -1,8 +1,7 @@
 #ifndef UGOKUONE_CHANNEL_H
 #define UGOKUONE_CHANNEL_H
 
-#define CH_SYN 0
-#define CH_ACK 1
+#define CH_CONNECTED 0
 
 #define CH_LED1 10
 #define CH_LED2 11
