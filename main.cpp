@@ -4,13 +4,23 @@
 #include "pin.h"
 #include <chrono>
 #include <cstdint>
+#include "motor_driver.h"
 
 PwmOut led(PIN_LED1);
 PwmOut servo(PIN_SERVO1);
-PwmOut motor(PIN_MOTOR1);
 AnalogIn sensor(PIN_ANALOG1);
 
+// Motor pins.
+PinName pwm_pin = PB_1, forward_pin = PB_4, backward_pin = PA_5;
+// Motor2 pins.
+PinName pwm_pin_2 = PB_0, forward_pin_2 = PA_8, backward_pin_2 = PB_5;
+
 ConsoleServer<CH_MAX> server;
+
+// Motor driver.
+MotorDriver driver(forward_pin, backward_pin, pwm_pin);
+MotorDriver driver2(forward_pin_2, backward_pin_2, pwm_pin_2);
+
 
 bool is_connected() {
   return server.read(CH_CONNECTED) != 0;
@@ -30,16 +40,16 @@ int main() {
     if (!is_connected()) {
       led.write(1);  // status: disconnected
       servo.pulsewidth_us(1500);
-      motor.write(0);
+      driver.drive(0);
+      driver.drive(0);
       continue;
     }
 
     led.write(0);  // status: connected
-    servo.pulsewidth_us(server.read_ratio(CH_SERVO1) * 1000 + 1000);
-    motor.write(server.read(CH_MOTOR1));
-
-    server.send(CH_SENSOR, sensor.read() * 255);
-
-    wait_us(100000);
+    servo.pulsewidth_us((int)((float)server.read(CH_SERVO1)/90 * 1000 + 500));
+    driver.drive(2 * server.read_ratio(CH_MOTOR1) - 1);
+    driver.drive(2 * server.read_ratio(CH_MOTOR1) - 1);
+    server.send(CH_SENSOR, 1/sensor.read()*7);
+    wait_us(1000);
   }
 }
