@@ -10,10 +10,15 @@ PwmOut led(PIN_LED1);
 PwmOut servo(PIN_SERVO1);
 AnalogIn sensor(PIN_ANALOG1);
 
-// Motor pins.
+// Motor pins V.0.4.4 and Later
+PinName pwm_pin = PB_0, forward_pin = PA_5, backward_pin = PA_8;
+PinName pwm_pin_2 = PB_1, forward_pin_2 = PB_4, backward_pin_2 = PB_5;
+
+/*
+// Motor pins V.0.4.3 
 PinName pwm_pin = PB_1, forward_pin = PB_4, backward_pin = PA_5;
-// Motor2 pins.
 PinName pwm_pin_2 = PB_0, forward_pin_2 = PA_8, backward_pin_2 = PB_5;
+*/
 
 ConsoleServer<CH_MAX> server;
 
