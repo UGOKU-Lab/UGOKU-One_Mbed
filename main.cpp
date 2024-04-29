@@ -53,7 +53,7 @@ int main() {
     led.write(0);  // status: connected
     servo.pulsewidth_us((int)((float)server.read(CH_SERVO1)/90 * 1000 + 500));
     driver.drive(2 * server.read_ratio(CH_MOTOR1) - 1);
-    driver.drive(2 * server.read_ratio(CH_MOTOR1) - 1);
+    driver2.drive(2 * server.read_ratio(CH_MOTOR2) - 1);
     server.send(CH_SENSOR, 1/sensor.read()*7);
     wait_us(1000);
   }
